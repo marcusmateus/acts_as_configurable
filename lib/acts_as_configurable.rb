@@ -207,6 +207,7 @@ module Nkryptic # :nodoc:
       end
       
       def responds_to?(what)
+        raise "responds_to doesn't exist"
         settings.responds_to?(what)
       end
       
@@ -273,6 +274,8 @@ module Nkryptic # :nodoc:
         if setting.is_a? Array
           setting.collect {|x| ProxySetting.new(x)}
         else
+          # If want to enable proper true/false functionality can maybe do so here
+          # by checking value type and not proxying for TrueClass or FalseClass
           ProxySetting.new(setting)
         end
       end
@@ -280,6 +283,8 @@ module Nkryptic # :nodoc:
       def []=(name, value) 
         name = name.to_s
         setting = find_setting(name)
+        # Is the is_a? Array code ever executed? When would find_setting() ever
+        # return an array??
         if setting.is_a? Array
           setting.collect do |x| 
             x.value_type = value.class.to_s
@@ -439,7 +444,7 @@ module Nkryptic # :nodoc:
       
       def []=(name, val)
         obj = self.value
-        if obj.responds_to? '[]='
+        if obj.respond_to? '[]='
           obj[name] = val
           self.value = obj
           self.save
@@ -450,7 +455,7 @@ module Nkryptic # :nodoc:
       
       def delete(name)
         obj = self.value
-        if obj.responds_to? 'delete'
+        if obj.respond_to? 'delete'
           obj.delete(name)
           self.value = obj
           self.save
